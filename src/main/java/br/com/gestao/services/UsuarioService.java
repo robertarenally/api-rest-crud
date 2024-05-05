@@ -86,9 +86,9 @@ public class UsuarioService {
 		return new ResponseEntity<>(dtoPage, HttpStatus.OK);
 	}
 
-	// SALVAR (INSERIR/ALTERAR)
+	// SALVAR (INSERIR/ALTERAR) O CADASTRO DO USUARIO, INCLUINDO O ENDERECO
 	@Transactional
-	public ResponseEntity<UsuarioDTO> salvar(final UsuarioDTO usuarioDTO) {
+	public ResponseEntity<UsuarioDTO> salvarUsuario(final UsuarioDTO usuarioDTO) {
 		Usuario itemSalvar = this.modelMapper.map(usuarioDTO, Usuario.class);
 		List<Endereco> enderecos = itemSalvar.getEnderecos();
 		
@@ -107,8 +107,35 @@ public class UsuarioService {
 		}
 		return new ResponseEntity<>(this.modelMapper.map(itemSalvar, UsuarioDTO.class), HttpStatus.OK);
 	}
+	
+	// SALVAR (INSERIR/ALTERAR) O CADASTRO DOS ENDERECOS DE UM USUARIO
+	@Transactional
+	public ResponseEntity<List<EnderecoDTO>> salvarEnderecos(final List<EnderecoDTO> enderecosDTO, final Long idUsuario) {
+		List<Endereco> enderecos = enderecosDTO.stream()
+				.map(enderecoDTO -> modelMapper.map(enderecoDTO, Endereco.class)).collect(Collectors.toList());
 
-	// DELETAR
+		// como fazer isso funcionar:
+		Usuario usuario = usuarioRepository.findById(idUsuario)
+				.orElseThrow(() -> new NotFoundException("Cadastro ID: " + idUsuario + " Não encontrado!!"));
+
+		// Mapeie cada endereço para o usuário específico e colete-os em uma lista
+		List<Endereco> enderecosMapeados = enderecos.stream().map(endereco -> {
+			endereco.setUsuario(usuario);
+			return endereco;
+		}).collect(Collectors.toList());
+
+		// salva os enderecos
+		if (enderecosMapeados != null) {
+			enderecosMapeados.forEach(c -> c = this.enderecoRepository.save(c));
+		}
+		
+		List<EnderecoDTO> enderecosSalvos = enderecosMapeados.stream()
+				.map(endereco -> modelMapper.map(endereco, EnderecoDTO.class)).collect(Collectors.toList());
+		
+		return new ResponseEntity<>(enderecosSalvos, HttpStatus.OK);
+	}
+
+	// DELETAR USUARIO
 	public ResponseEntity<Boolean> delete(Long id) {
 		if (usuarioRepository.existsById(id)) {
 			usuarioRepository.deleteById(id);

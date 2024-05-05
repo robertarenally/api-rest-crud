@@ -73,14 +73,26 @@ public class UsuarioController {
 
 	@Operation(summary = "Salvar um cadastro completo do Usuario, incluindo os seus endereços")
 	@PostMapping(value = "/salvar", headers = { Const.HEADER_ACCEPT_JSON }, produces = Const.JSON_TYPE, consumes = Const.JSON_TYPE)
-	public ResponseEntity<UsuarioDTO> salvar(@RequestBody UsuarioDTO body) {
-		return usuarioService.salvar(body);
+	public ResponseEntity<UsuarioDTO> salvarUsuario(@RequestBody UsuarioDTO body) {
+		return usuarioService.salvarUsuario(body);
+	}
+	
+	@Operation(summary = "Salvar endereços para um usuario especifico")
+	@PostMapping(value = "/{id}/enderecos/salvar", headers = { Const.HEADER_ACCEPT_JSON }, produces = Const.JSON_TYPE, consumes = Const.JSON_TYPE)
+	public ResponseEntity<List<EnderecoDTO>> salvarEnderecos(@PathVariable Long id, @RequestBody List<EnderecoDTO> enderecos) {
+		return usuarioService.salvarEnderecos(enderecos, id);
 	}
 
 	@Operation(summary = "Alterar um cadastro completo do Usuario, incluindo os seus endereços")
 	@PutMapping(value = "/alterar", headers = { Const.HEADER_ACCEPT_JSON }, produces = Const.JSON_TYPE, consumes = Const.JSON_TYPE)
-	ResponseEntity<UsuarioDTO> update(@RequestBody UsuarioDTO body) {
-		return usuarioService.salvar(body);
+	ResponseEntity<UsuarioDTO> updateUsuario(@RequestBody UsuarioDTO body) {
+		return usuarioService.salvarUsuario(body);
+	}
+	
+	@Operation(summary = "Alterar endereços para um usuario especifico")
+	@PutMapping(value = "/{id}/enderecos/alterar", headers = { Const.HEADER_ACCEPT_JSON }, produces = Const.JSON_TYPE, consumes = Const.JSON_TYPE)
+	public ResponseEntity<List<EnderecoDTO>> updateEnderecos(@PathVariable Long id, @RequestBody List<EnderecoDTO> enderecos) {
+		return usuarioService.salvarEnderecos(enderecos, id);
 	}
 
 	@DeleteMapping("/{id}")

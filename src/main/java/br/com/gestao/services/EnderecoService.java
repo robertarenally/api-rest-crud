@@ -16,33 +16,27 @@ import br.com.gestao.dto.EnderecoDTO;
 import br.com.gestao.entities.Endereco;
 import br.com.gestao.exceptions.NotFoundException;
 import br.com.gestao.repositories.EnderecoRepository;
-import br.com.gestao.repositories.UsuarioRepository;
 
 @Service
 public class EnderecoService {
 
-	private final UsuarioRepository usuarioRepository;
 	private final EnderecoRepository enderecoRepository;
 	private final ModelMapper modelMapper;
 
-	public EnderecoService(UsuarioRepository usuarioRepository, EnderecoRepository enderecoRepository,
-			ModelMapper modelMapper) {
-		this.usuarioRepository = usuarioRepository;
+	public EnderecoService(EnderecoRepository enderecoRepository, ModelMapper modelMapper) {
 		this.enderecoRepository = enderecoRepository;
 		this.modelMapper = modelMapper;
 	}
 
 	// LISTAR POR ID
 	public EnderecoDTO findById(Long id) {
-		Endereco endereco = enderecoRepository.findById(id)
-				.orElseThrow(() -> new NotFoundException("Cadastro ID: " + id + " Não encontrado!!"));
+		Endereco endereco = enderecoRepository.findById(id).orElseThrow(() -> new NotFoundException("Cadastro ID: " + id + " Não encontrado!!"));
 		return this.modelMapper.map(endereco, EnderecoDTO.class);
 	}
 
 	// LISTAR TODOS
 	public List<EnderecoDTO> findAll() {
-		return enderecoRepository.findAll().stream().map(valorCC -> modelMapper.map(valorCC, EnderecoDTO.class))
-				.collect(Collectors.toList());
+		return enderecoRepository.findAll().stream().map(valorCC -> modelMapper.map(valorCC, EnderecoDTO.class)).collect(Collectors.toList());
 	}
 
 	// LISTAR TODOS OS ENDEREÇOS POR CEP
@@ -99,22 +93,5 @@ public class EnderecoService {
 			dtoPage = page.map(item -> this.modelMapper.map(item, EnderecoDTO.class));
 		}
 		return new ResponseEntity<>(dtoPage, HttpStatus.OK);
-	}
-
-	// SALVAR (INSERIR/ALTERAR) APENAS O ENDEREÇO
-	@Transactional
-	public ResponseEntity<EnderecoDTO> salvar(final EnderecoDTO enderecoDTO) {
-		Endereco itemSalvar = this.modelMapper.map(enderecoDTO, Endereco.class);
-		itemSalvar = enderecoRepository.save(itemSalvar);
-		return new ResponseEntity<>(this.modelMapper.map(itemSalvar, EnderecoDTO.class), HttpStatus.OK);
-	}
-
-	// DELETAR
-	public ResponseEntity<Boolean> delete(Long id) {
-		if (enderecoRepository.existsById(id)) {
-			enderecoRepository.deleteById(id);
-			return new ResponseEntity<>(true, HttpStatus.OK);
-		}
-		return new ResponseEntity<>(false, HttpStatus.OK);
 	}
 }

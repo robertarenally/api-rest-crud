@@ -16,6 +16,8 @@ public interface EnderecoRepository extends JpaRepository<Endereco, Long> {
 	
 	Page<Endereco> findByEstado(String cep, PageRequest pageRequest);
 	
+	Page<Endereco> findByUsuarioId(Long Id, PageRequest pageRequest);
+	
 	@Query("select e from Endereco e")
 	Page<Endereco> listAllByPages(Pageable pageable);
 }

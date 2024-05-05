@@ -5,12 +5,8 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -79,23 +75,5 @@ public class EnderecoController {
 			@RequestParam(value = "page", required = false, defaultValue = "1") Integer pagina,
 			@RequestParam(value = "quantity", required = false, defaultValue = "50") Integer quantidade) {
 		return this.enderecoService.findAll(pagina, quantidade);
-	}
-
-	@Operation(summary = "Salvar um novo endereço a um usuário que já existe no banco")
-	@PostMapping(value = "/salvar", headers = { Const.HEADER_ACCEPT_JSON }, produces = Const.JSON_TYPE, consumes = Const.JSON_TYPE)
-	public ResponseEntity<EnderecoDTO> salvar(@RequestBody EnderecoDTO body) {
-		return enderecoService.salvar(body);
-	}
-
-	@Operation(summary = "Alterar somente um endereço que já exista no banco")
-	@PutMapping(value = "/alterar", headers = { Const.HEADER_ACCEPT_JSON }, produces = Const.JSON_TYPE, consumes = Const.JSON_TYPE)
-	ResponseEntity<EnderecoDTO> update(@RequestBody EnderecoDTO body) {
-		return enderecoService.salvar(body);
-	}
-
-	@DeleteMapping("/{id}")
-	@Operation(summary = "Excluir cadastro de Endereco")
-	public ResponseEntity<Boolean> delete(@PathVariable Long id) {
-		return enderecoService.delete(id);
 	}
 }

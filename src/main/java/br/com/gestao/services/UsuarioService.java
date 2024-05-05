@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import br.com.gestao.dto.EnderecoDTO;
 import br.com.gestao.dto.UsuarioDTO;
 import br.com.gestao.entities.Endereco;
 import br.com.gestao.entities.Usuario;
@@ -41,6 +42,20 @@ public class UsuarioService {
 	// LISTAR TODOS
 	public List<UsuarioDTO> findAll() {
 		return usuarioRepository.findAll().stream().map(valorCC -> modelMapper.map(valorCC, UsuarioDTO.class)).collect(Collectors.toList());
+	}
+	
+	// LISTAR TODOS OS ENDEREÇOS DE UM USUARIO
+	public ResponseEntity<Page<EnderecoDTO>> findEnderecoByIdUsuario(Long id,Integer pagina, Integer quantidade) {
+		Sort sort = Sort.by("id").ascending();
+		PageRequest pageRequest = PageRequest.of(pagina - 1, quantidade, sort);
+		
+		Page<Endereco> page = this.enderecoRepository.findByUsuarioId(id, pageRequest);
+		
+		Page<EnderecoDTO> dtoPage = null;
+		if (page != null) {
+			dtoPage = page.map(item -> this.modelMapper.map(item, EnderecoDTO.class));
+		}
+		return new ResponseEntity<>(dtoPage, HttpStatus.OK);
 	}
 	
 	// LISTAR TODOS OS USUARIO QUE TEM UM NOME PARECIDO COM O VALOR DO NOME CONSULTADO

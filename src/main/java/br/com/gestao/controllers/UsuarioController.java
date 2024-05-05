@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.com.gestao.commons.Const;
+import br.com.gestao.dto.EnderecoDTO;
 import br.com.gestao.dto.UsuarioDTO;
 import br.com.gestao.services.UsuarioService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -43,6 +44,14 @@ public class UsuarioController {
 	@Operation(summary = "Listar todos os cadastros de Usuario")
 	public ResponseEntity<List<UsuarioDTO>> findAll() {
 		return ResponseEntity.ok(usuarioService.findAll());
+	}
+	
+	@GetMapping("/{id}/enderecos")
+	@Operation(summary = "Listar todos os endereços de um usuário")
+	public ResponseEntity<Page<EnderecoDTO>> findById(@PathVariable Long id,
+			@RequestParam(value = "page", required = false, defaultValue = "1") Integer pagina,
+			@RequestParam(value = "quantity", required = false, defaultValue = "50") Integer quantidade) {
+		return usuarioService.findEnderecoByIdUsuario(id, pagina, quantidade);
 	}
 	
 	@Operation(summary = "Listar todos os Usuarios e mostrar o resultado utilizando paginação")

@@ -10,6 +10,8 @@ public class Const {
 
 	public static final String HEADER_ACCEPT_JSON = "Accept=application/json";
 	
+	public static final String FORMATO_DATA_BR = "dd/MM/yyyy";
+	
 	//NOMES DE TABELAS
 	public static final String TB_USUARIO = "TB_USUARIO";
 	public static final String TB_ENDERECO = "TB_ENDERECO";

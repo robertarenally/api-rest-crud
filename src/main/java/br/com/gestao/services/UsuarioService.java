@@ -74,13 +74,25 @@ public class UsuarioService {
 	public ResponseEntity<UsuarioDTO> salvar(final UsuarioDTO usuarioDTO) {
 		Usuario itemSalvar = this.modelMapper.map(usuarioDTO, Usuario.class);
 		List<Endereco> enderecos = itemSalvar.getEnderecos();
-
+		
+		//salva os enderecos
 		if (enderecos != null) {
 			enderecos.forEach(c -> c = this.enderecoRepository.save(c));
 			itemSalvar.setEnderecos(enderecos);
 		}
-
+		//salva o usuario:
 		itemSalvar = usuarioRepository.save(itemSalvar);
+		
+		//atribui o usuario com id criado aos mesmos endereços
+		for (Endereco endereco : enderecos) {
+			endereco.setUsuario(itemSalvar);
+        }
+		
+		// faz update dos endereços
+		if (enderecos != null) {
+			enderecos.forEach(c -> c = this.enderecoRepository.save(c));
+			itemSalvar.setEnderecos(enderecos);
+		}
 		return new ResponseEntity<>(this.modelMapper.map(itemSalvar, UsuarioDTO.class), HttpStatus.OK);
 	}
 

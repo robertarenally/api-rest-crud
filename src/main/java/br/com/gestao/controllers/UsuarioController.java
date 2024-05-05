@@ -98,7 +98,13 @@ public class UsuarioController {
 
 	@DeleteMapping("/{id}")
 	@Operation(summary = "Excluir cadastro de Usuario")
-	public ResponseEntity<Boolean> delete(@PathVariable Long id) {
-		return usuarioService.delete(id);
+	public ResponseEntity<Boolean> deleteUsuario(@PathVariable Long id) {
+		return usuarioService.deleteUsuario(id);
+	}
+	
+	@DeleteMapping("/{idUsuario}/endereco/{idEndereco}")
+	@Operation(summary = "Excluir cadastro de Usuario")
+	public ResponseEntity<Boolean> deleteEndereco(@PathVariable Long idUsuario, @PathVariable Long idEndereco) {
+		return usuarioService.deleteEndereco(idUsuario, idEndereco);
 	}
 }

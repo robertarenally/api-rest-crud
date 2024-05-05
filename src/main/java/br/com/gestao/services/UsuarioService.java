@@ -141,9 +141,18 @@ public class UsuarioService {
 	}
 
 	// DELETAR USUARIO
-	public ResponseEntity<Boolean> delete(Long id) {
+	public ResponseEntity<Boolean> deleteUsuario(Long id) {
 		if (usuarioRepository.existsById(id)) {
 			usuarioRepository.deleteById(id);
+			return new ResponseEntity<>(true, HttpStatus.OK);
+		}
+		return new ResponseEntity<>(false, HttpStatus.OK);
+	}
+	
+	// DELETAR ENDERECO DE UM USUARIO
+	public ResponseEntity<Boolean> deleteEndereco(Long idUsuario, Long idEndereco) {
+		if (usuarioRepository.existsById(idUsuario)) {
+			enderecoRepository.deleteById(idEndereco);
 			return new ResponseEntity<>(true, HttpStatus.OK);
 		}
 		return new ResponseEntity<>(false, HttpStatus.OK);

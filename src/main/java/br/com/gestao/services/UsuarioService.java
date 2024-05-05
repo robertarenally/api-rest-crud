@@ -10,6 +10,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import br.com.gestao.dto.UsuarioDTO;
 import br.com.gestao.entities.Endereco;
@@ -71,15 +72,11 @@ public class UsuarioService {
 	}
 
 	// SALVAR (INSERIR/ALTERAR)
+	@Transactional
 	public ResponseEntity<UsuarioDTO> salvar(final UsuarioDTO usuarioDTO) {
 		Usuario itemSalvar = this.modelMapper.map(usuarioDTO, Usuario.class);
 		List<Endereco> enderecos = itemSalvar.getEnderecos();
 		
-		//salva os enderecos
-		if (enderecos != null) {
-			enderecos.forEach(c -> c = this.enderecoRepository.save(c));
-			itemSalvar.setEnderecos(enderecos);
-		}
 		//salva o usuario:
 		itemSalvar = usuarioRepository.save(itemSalvar);
 		
@@ -88,7 +85,7 @@ public class UsuarioService {
 			endereco.setUsuario(itemSalvar);
         }
 		
-		// faz update dos endereços
+		//salva os enderecos
 		if (enderecos != null) {
 			enderecos.forEach(c -> c = this.enderecoRepository.save(c));
 			itemSalvar.setEnderecos(enderecos);

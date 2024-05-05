@@ -81,13 +81,13 @@ public class EnderecoController {
 		return this.enderecoService.findAll(pagina, quantidade);
 	}
 
-	@Operation(summary = "Vincular um novo endereço a um usuário que já existe no banco")
+	@Operation(summary = "Salvar um novo endereço a um usuário que já existe no banco")
 	@PostMapping(value = "/salvar", headers = { Const.HEADER_ACCEPT_JSON }, produces = Const.JSON_TYPE, consumes = Const.JSON_TYPE)
 	public ResponseEntity<EnderecoDTO> salvar(@RequestBody EnderecoDTO body) {
 		return enderecoService.salvar(body);
 	}
 
-	@Operation(summary = "Alterar o endereço vinculado a um usuário que já existe no banco")
+	@Operation(summary = "Alterar somente um endereço que já exista no banco")
 	@PutMapping(value = "/alterar", headers = { Const.HEADER_ACCEPT_JSON }, produces = Const.JSON_TYPE, consumes = Const.JSON_TYPE)
 	ResponseEntity<EnderecoDTO> update(@RequestBody EnderecoDTO body) {
 		return enderecoService.salvar(body);

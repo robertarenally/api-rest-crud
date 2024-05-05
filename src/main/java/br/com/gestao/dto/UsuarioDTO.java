@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.DateSerializer;
@@ -32,5 +33,6 @@ public class UsuarioDTO {
 	@JsonSerialize(using = DateSerializer.class)
 	private Date dataNascimento;
 	
+	@JsonManagedReference
 	private List<EnderecoDTO> enderecos = new ArrayList<>();
 }

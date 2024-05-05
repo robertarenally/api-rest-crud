@@ -12,8 +12,6 @@ import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-
 import br.com.gestao.commons.Const;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -56,7 +54,6 @@ public class Endereco {
 	
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "id_usuario")
-	@JsonManagedReference // indica que no relacionamento bi-direcional esse é o "pai"
 	private Usuario usuario;
 	
 	@PrePersist

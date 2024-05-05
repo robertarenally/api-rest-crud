@@ -16,7 +16,6 @@ import javax.persistence.Table;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.DateSerializer;
@@ -40,18 +39,17 @@ public class Usuario {
 	@GeneratedValue
 	@Column(name = "id", nullable = false, unique = true)
 	private Long id;
-	
+
 	@Column(name = "nome_completo", length = 200, nullable = true)
 	private String nome;
-	
+
 	@Column(name = "data_nascimento")
 	@JsonDeserialize(using = DateDeserializer.class)
 	@JsonSerialize(using = DateSerializer.class)
 	private Date dataNascimento;
-	
+
 	@OneToMany(fetch = FetchType.EAGER, mappedBy = "usuario", targetEntity = Endereco.class, cascade = CascadeType.REMOVE, orphanRemoval = true)
 	@LazyCollection(LazyCollectionOption.FALSE)
 	@Builder.Default
-	@JsonBackReference // indica que no relacionamento bi-direcional esse é o "filho"
 	private List<Endereco> enderecos = new ArrayList<>();
 }

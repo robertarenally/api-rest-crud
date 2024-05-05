@@ -10,13 +10,11 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import br.com.gestao.dto.EnderecoDTO;
-import br.com.gestao.dto.UsuarioDTO;
 import br.com.gestao.entities.Endereco;
-import br.com.gestao.entities.Usuario;
 import br.com.gestao.exceptions.NotFoundException;
-import br.com.gestao.exceptions.OtherErrorException;
 import br.com.gestao.repositories.EnderecoRepository;
 import br.com.gestao.repositories.UsuarioRepository;
 
@@ -103,19 +101,10 @@ public class EnderecoService {
 		return new ResponseEntity<>(dtoPage, HttpStatus.OK);
 	}
 
-	// SALVAR (INSERIR/ALTERAR) APENAS O ENDEREÇO DE VINCULADO A UM USUÁRIO
+	// SALVAR (INSERIR/ALTERAR) APENAS O ENDEREÇO
+	@Transactional
 	public ResponseEntity<EnderecoDTO> salvar(final EnderecoDTO enderecoDTO) {
 		Endereco itemSalvar = this.modelMapper.map(enderecoDTO, Endereco.class);
-		Usuario usuario1 = itemSalvar.getUsuario();
-
-		if (usuario1 != null && usuario1.getId() != null) {
-			Usuario usuario2 = this.usuarioRepository.findById(usuario1.getId())
-					.orElseThrow(() -> new NotFoundException("Cadastro ID: " + usuario1.getId() + " Não encontrado!!"));
-			itemSalvar.setUsuario(usuario2);
-		} else {
-			throw new OtherErrorException("Não foi possível encontrar o usuário vinculado a esse endereço");
-		}
-
 		itemSalvar = enderecoRepository.save(itemSalvar);
 		return new ResponseEntity<>(this.modelMapper.map(itemSalvar, EnderecoDTO.class), HttpStatus.OK);
 	}

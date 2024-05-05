@@ -1,5 +1,7 @@
 package br.com.gestao.repositories;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -17,6 +19,8 @@ public interface EnderecoRepository extends JpaRepository<Endereco, Long> {
 	Page<Endereco> findByEstado(String cep, PageRequest pageRequest);
 	
 	Page<Endereco> findByUsuarioId(Long Id, PageRequest pageRequest);
+	
+	List<Endereco> findByUsuarioId(Long Id);
 	
 	@Query("select e from Endereco e")
 	Page<Endereco> listAllByPages(Pageable pageable);

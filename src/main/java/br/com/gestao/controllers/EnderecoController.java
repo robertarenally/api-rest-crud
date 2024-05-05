@@ -26,7 +26,6 @@ public class EnderecoController {
 	private final EnderecoService enderecoService;
 
 	public EnderecoController(EnderecoService enderecoService) {
-		super();
 		this.enderecoService = enderecoService;
 	}
 

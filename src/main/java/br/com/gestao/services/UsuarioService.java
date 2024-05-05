@@ -17,7 +17,6 @@ import br.com.gestao.dto.UsuarioDTO;
 import br.com.gestao.entities.Endereco;
 import br.com.gestao.entities.Usuario;
 import br.com.gestao.exceptions.NotFoundException;
-import br.com.gestao.exceptions.OtherErrorException;
 import br.com.gestao.repositories.EnderecoRepository;
 import br.com.gestao.repositories.UsuarioRepository;
 

@@ -24,7 +24,14 @@ Essa api foi implementada utilizando
 - Swagger
 - MySql
 
-Tela da API rodando com swagger (http://localhost:8080/swagger-ui.html)
+## Para fazer o deploy no seu ambiente, basta configurar algumas coias
 
+1. Alterar os dados de conexão com o banco, para o banco MySql do seu ambiente:
+![conexao banco de dados](/images/conexao-mysql.png)
+
+2. Exemplo de deploy da api no Eclipse IDE:
+![deploy api no eclipse ide](/images/deploy-api-eclipse-ide.png)
+
+3. Tela da API rodando com swagger no endereço(http://localhost:8080/swagger-ui.html)
 ![api running](/images/tela-api.png)
 

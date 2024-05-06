@@ -36,6 +36,7 @@ Essa api foi implementada utilizando
 ![api running](/images/tela-api.png)
 
 4. Execução dos testes pelo Junit no Eclipse
+<br>
 ![execucao testes unitarios](/images/execucao-testes-junit.png)
 
 5. Cobertura dos testes pelo Junit no Eclipse

@@ -41,3 +41,11 @@ Essa api foi implementada utilizando
 
 5. Cobertura dos testes pelo Junit no Eclipse
 ![cobertura testes unitarios](/images/cobertura-testes-junit.png)
+
+6. Rodar análise do sonarQube
+
+```
+mvn sonar:sonar -Dsonar.login=admin -Dsonar.password=password -Dsonar.host.url=http://localhost:9000
+```
+
+![analise sonar](/images/tela-sonar.png)

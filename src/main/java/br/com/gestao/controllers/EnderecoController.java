@@ -21,7 +21,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RestController
 @CrossOrigin
 @RequestMapping("/enderecos")
-@Tag(name = "Endereco", description = "Operações no cadastro do Endereco")
+@Tag(name = "EnderecoController", description = "Operações de consulta no Endereco")
 public class EnderecoController {
 
 	private final EnderecoService enderecoService;

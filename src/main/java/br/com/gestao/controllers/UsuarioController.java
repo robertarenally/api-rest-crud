@@ -26,7 +26,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RestController
 @CrossOrigin
 @RequestMapping("/usuarios")
-@Tag(name = "Usuario", description = "Operações no cadastro do Usuario")
+@Tag(name = "UsuarioController", description = "Operações no cadastro e consulta dos dados do Usuario")
 public class UsuarioController {
 
 	private final UsuarioService usuarioService;

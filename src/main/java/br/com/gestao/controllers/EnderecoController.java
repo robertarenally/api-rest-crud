@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.com.gestao.commons.Const;
+import br.com.gestao.commons.ResponseWrapper;
 import br.com.gestao.dto.EnderecoDTO;
 import br.com.gestao.services.EnderecoService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -31,19 +32,19 @@ public class EnderecoController {
 
 	@GetMapping("/{id}")
 	@Operation(summary = "Pesquisar por ID do cadastro de Endereco")
-	public ResponseEntity<EnderecoDTO> findById(@PathVariable Long id) {
-		return ResponseEntity.ok(enderecoService.findById(id));
+	public ResponseEntity<ResponseWrapper<EnderecoDTO>> findById(@PathVariable Long id) {
+		return enderecoService.findById(id);
 	}
 
 	@GetMapping
 	@Operation(summary = "Listar todos os cadastros de Endereco")
-	public ResponseEntity<List<EnderecoDTO>> findAll() {
-		return ResponseEntity.ok(enderecoService.findAll());
+	public ResponseEntity<ResponseWrapper<List<EnderecoDTO>>> findAll() {
+		return enderecoService.findAll();
 	}
 	
 	@Operation(summary = "Listar todos os endereços por cep")
 	@GetMapping(value = "/listar-por-cep", produces = Const.JSON_TYPE)
-	public ResponseEntity<Page<EnderecoDTO>> findByCep(
+	public ResponseEntity<ResponseWrapper<Page<EnderecoDTO>>> findByCep(
 			@RequestParam(value = "page", required = false, defaultValue = "1") Integer pagina,
 			@RequestParam(value = "quantity", required = false, defaultValue = "50") Integer quantidade,
 			@RequestParam(value = "cep", required = false, defaultValue = "") String cep) {
@@ -52,7 +53,7 @@ public class EnderecoController {
 	
 	@Operation(summary = "Listar todos os endereços por cidade")
 	@GetMapping(value = "/listar-por-cidade", produces = Const.JSON_TYPE)
-	public ResponseEntity<Page<EnderecoDTO>> findByCidade(
+	public ResponseEntity<ResponseWrapper<Page<EnderecoDTO>>> findByCidade(
 			@RequestParam(value = "page", required = false, defaultValue = "1") Integer pagina,
 			@RequestParam(value = "quantity", required = false, defaultValue = "50") Integer quantidade,
 			@RequestParam(value = "city", required = false, defaultValue = "") String cidade) {
@@ -61,7 +62,7 @@ public class EnderecoController {
 	
 	@Operation(summary = "Listar todos os endereços por estado")
 	@GetMapping(value = "/listar-por-estado", produces = Const.JSON_TYPE)
-	public ResponseEntity<Page<EnderecoDTO>> findByestado(
+	public ResponseEntity<ResponseWrapper<Page<EnderecoDTO>>> findByestado(
 			@RequestParam(value = "page", required = false, defaultValue = "1") Integer pagina,
 			@RequestParam(value = "quantity", required = false, defaultValue = "50") Integer quantidade,
 			@RequestParam(value = "state", required = false, defaultValue = "") String estado) {
@@ -70,7 +71,7 @@ public class EnderecoController {
 	
 	@Operation(summary = "Listar todos os endereços e mostrar o resultado utilizando paginação")
 	@GetMapping(value = "/listar-todos", produces = Const.JSON_TYPE)
-	public ResponseEntity<Page<EnderecoDTO>> findAll(
+	public ResponseEntity<ResponseWrapper<Page<EnderecoDTO>>> findAll(
 			@RequestParam(value = "page", required = false, defaultValue = "1") Integer pagina,
 			@RequestParam(value = "quantity", required = false, defaultValue = "50") Integer quantidade) {
 		return this.enderecoService.findAll(pagina, quantidade);

@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
@@ -482,5 +483,72 @@ class UsuarioServiceTest {
 		assertEquals(HttpStatus.CREATED, responseEntity.getStatusCode());
 		assertEquals(enderecoDTO.getId(), responseEntity.getBody().getData().getId());
 		assertEquals(null, responseEntity.getBody().getMessage());
+	}
+	
+	@Test
+	void testeDeletarUsuarioComSucesso() throws Exception {
+
+		// Configurar comportamento simulado do repository
+		when(usuarioRepository.existsById(Mockito.any())).thenReturn(true);
+		doNothing().when(usuarioRepository).deleteById(Mockito.any());
+
+		ResponseEntity<ResponseWrapper<String>> responseEntity = usuarioService.deleteUsuario(usuario.getId());
+		// Verificação do resultado
+		assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+
+	}
+	
+	@Test
+	void testeDeletarUsuarioComErro() throws Exception {
+
+		// Configurar comportamento simulado do repository
+		when(usuarioRepository.existsById(Mockito.any())).thenReturn(false);
+		doNothing().when(usuarioRepository).deleteById(Mockito.any());
+
+		ResponseEntity<ResponseWrapper<String>> responseEntity = usuarioService.deleteUsuario(usuario.getId());
+		// Verificação do resultado
+		assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
+
+	}
+	
+	@Test
+	void testeDeletarEnderecoDeUsuarioComSucesso() throws Exception {
+
+		// Configurar comportamento simulado do repository
+		when(usuarioRepository.existsById(Mockito.any())).thenReturn(true);
+		when(enderecoRepository.existsById(Mockito.any())).thenReturn(true);
+		doNothing().when(enderecoRepository).deleteById(Mockito.any());
+
+		ResponseEntity<ResponseWrapper<String>> responseEntity = usuarioService.deleteEndereco(usuario.getId(), endereco.getId());
+		// Verificação do resultado
+		assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+
+	}
+	
+	@Test
+	void testeDeletarEnderecoDeUsuarioComErroDeUsuarioNaoEncontrado() throws Exception {
+
+		// Configurar comportamento simulado do repository
+		when(usuarioRepository.existsById(Mockito.any())).thenReturn(false);
+		doNothing().when(enderecoRepository).deleteById(Mockito.any());
+
+		ResponseEntity<ResponseWrapper<String>> responseEntity = usuarioService.deleteEndereco(usuario.getId(), endereco.getId());
+		// Verificação do resultado
+		assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
+
+	}
+	
+	@Test
+	void testeDeletarEnderecoDeUsuarioComErroDeEnderecoNaoEncontrado() throws Exception {
+
+		// Configurar comportamento simulado do repository
+		when(usuarioRepository.existsById(Mockito.any())).thenReturn(true);
+		when(enderecoRepository.existsById(Mockito.any())).thenReturn(false);
+		doNothing().when(enderecoRepository).deleteById(Mockito.any());
+
+		ResponseEntity<ResponseWrapper<String>> responseEntity = usuarioService.deleteEndereco(usuario.getId(), endereco.getId());
+		// Verificação do resultado
+		assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
+
 	}
 }

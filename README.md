@@ -35,3 +35,8 @@ Essa api foi implementada utilizando
 3. Tela da API rodando com swagger no endereço(http://localhost:8080/swagger-ui.html)
 ![api running](/images/tela-api.png)
 
+4. Execução dos testes pelo Junit no Eclipse
+![execucao testes unitarios](/images/execucao-testes-junit.png)
+
+5. Cobertura dos testes pelo Junit no Eclipse
+![cobertura testes unitarios](/images/cobertura-testes-junit.png)

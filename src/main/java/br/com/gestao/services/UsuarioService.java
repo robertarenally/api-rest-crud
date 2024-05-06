@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import br.com.gestao.commons.ResponseWrapper;
 import br.com.gestao.dto.EnderecoDTO;
 import br.com.gestao.dto.UsuarioDTO;
 import br.com.gestao.entities.Endereco;
@@ -33,62 +34,86 @@ public class UsuarioService {
 		this.modelMapper = modelMapper;
 	}
 
-	// LISTAR POR ID
-	public UsuarioDTO findById(Long id) {
-		Usuario usuario = usuarioRepository.findById(id).orElseThrow(() -> new NotFoundException("Cadastro ID: " + id + " Não encontrado!!"));
-		return this.modelMapper.map(usuario, UsuarioDTO.class);
+	// LISTAR USUARIO POR ID
+	public ResponseEntity<ResponseWrapper<UsuarioDTO>> findById(Long id) {
+		Usuario usuario = usuarioRepository.findById(id).orElse(null);
+		if(usuario != null)
+		{
+			return new ResponseEntity<>(new ResponseWrapper<>(this.modelMapper.map(usuario, UsuarioDTO.class), null), HttpStatus.OK);
+		}else {
+			ResponseWrapper<UsuarioDTO> responseWrapper = new ResponseWrapper<>();
+	        responseWrapper.setMessage("Usuário não encontrado com o ID: " + id);
+	        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responseWrapper);
+		}
 	}
 
 	// LISTAR TODOS
-	public List<UsuarioDTO> findAll() {
-		return usuarioRepository.findAll().stream().map(valorCC -> modelMapper.map(valorCC, UsuarioDTO.class)).collect(Collectors.toList());
+	public ResponseEntity<ResponseWrapper<List<UsuarioDTO>>> findAll() {
+		List<UsuarioDTO> usuarios = usuarioRepository.findAll().stream().map(valorCC -> modelMapper.map(valorCC, UsuarioDTO.class)).collect(Collectors.toList());
+		if(usuarios != null)
+		{
+			return new ResponseEntity<>(new ResponseWrapper<>(usuarios, null), HttpStatus.OK);
+		}else {
+			ResponseWrapper<List<UsuarioDTO>> responseWrapper = new ResponseWrapper<>();
+	        responseWrapper.setMessage("Base de dados não tem nenhum usuário cadastrado");
+	        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responseWrapper);
+		}
 	}
 	
 	// LISTAR TODOS OS ENDEREÇOS DE UM USUARIO
-	public ResponseEntity<Page<EnderecoDTO>> findEnderecoByIdUsuario(Long id,Integer pagina, Integer quantidade) {
+	public ResponseEntity<ResponseWrapper<Page<EnderecoDTO>>> findEnderecoByIdUsuario(Long id,Integer pagina, Integer quantidade) {
 		Sort sort = Sort.by("id").ascending();
 		PageRequest pageRequest = PageRequest.of(pagina - 1, quantidade, sort);
 		
 		Page<Endereco> page = this.enderecoRepository.findByUsuarioId(id, pageRequest);
-		
-		Page<EnderecoDTO> dtoPage = null;
-		if (page != null) {
-			dtoPage = page.map(item -> this.modelMapper.map(item, EnderecoDTO.class));
+
+		if (page != null && !page.isEmpty()) {
+			Page<EnderecoDTO> dtoPage = page.map(item -> this.modelMapper.map(item, EnderecoDTO.class));
+			return new ResponseEntity<>(new ResponseWrapper<>(dtoPage, null), HttpStatus.OK);
+		}else {
+			ResponseWrapper<Page<EnderecoDTO>> responseWrapper = new ResponseWrapper<>();
+	        responseWrapper.setMessage("Não foram encontrados endereços para esse usuário");
+	        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responseWrapper);
 		}
-		return new ResponseEntity<>(dtoPage, HttpStatus.OK);
 	}
 	
 	// LISTAR TODOS OS USUARIO QUE TEM UM NOME PARECIDO COM O VALOR DO NOME CONSULTADO
-	public ResponseEntity<Page<UsuarioDTO>> findByNomeLike(Integer pagina, Integer quantidade, String nome) {
+	public ResponseEntity<ResponseWrapper<Page<UsuarioDTO>>> findByNomeLike(Integer pagina, Integer quantidade, String nome) {
 		Sort sort = Sort.by("nome").ascending();
 		PageRequest pageRequest = PageRequest.of(pagina - 1, quantidade, sort);
 
 		Page<Usuario> page = this.usuarioRepository.findByNomeLike("%" + nome + "%", pageRequest);
 
-		Page<UsuarioDTO> dtoPage = null;
-		if (page != null) {
-			dtoPage = page.map(item -> this.modelMapper.map(item, UsuarioDTO.class));
+		if (page != null && !page.isEmpty()) {
+			Page<UsuarioDTO> dtoPage = page.map(item -> this.modelMapper.map(item, UsuarioDTO.class));
+			return new ResponseEntity<>(new ResponseWrapper<>(dtoPage, null), HttpStatus.OK);
+		}else {
+			ResponseWrapper<Page<UsuarioDTO>> responseWrapper = new ResponseWrapper<>();
+	        responseWrapper.setMessage("Não foram encontrados usuários com esse nome");
+	        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responseWrapper);
 		}
-		return new ResponseEntity<>(dtoPage, HttpStatus.OK);
 	}
 
 	// LISTAR TODOS E MOSTRAR O RESULTADO UTILIZANDO PAGINAÇÃO
-	public ResponseEntity<Page<UsuarioDTO>> findAll(Integer pagina, Integer quantidade) {
+	public ResponseEntity<ResponseWrapper<Page<UsuarioDTO>>> findAll(Integer pagina, Integer quantidade) {
 		Sort sort = Sort.by("id").ascending();
 		PageRequest pageRequest = PageRequest.of(pagina - 1, quantidade, sort);
 		
 		Page<Usuario> page = this.usuarioRepository.listAllByPages(pageRequest);
-		
-		Page<UsuarioDTO> dtoPage = null;
-		if (page != null) {
-			dtoPage = page.map(item -> this.modelMapper.map(item, UsuarioDTO.class));
+
+		if (page != null && !page.isEmpty()) {
+			Page<UsuarioDTO> dtoPage = page.map(item -> this.modelMapper.map(item, UsuarioDTO.class));
+			return new ResponseEntity<>(new ResponseWrapper<>(dtoPage, null), HttpStatus.OK);
+		}else {
+			ResponseWrapper<Page<UsuarioDTO>> responseWrapper = new ResponseWrapper<>();
+	        responseWrapper.setMessage("Não foram encontrados usuários na base de dados");
+	        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responseWrapper);
 		}
-		return new ResponseEntity<>(dtoPage, HttpStatus.OK);
 	}
 
 	// SALVAR (INSERIR/ALTERAR) O CADASTRO DO USUARIO, INCLUINDO O ENDERECO
 	@Transactional
-	public ResponseEntity<UsuarioDTO> salvarUsuario(final UsuarioDTO usuarioDTO) {
+	public ResponseEntity<ResponseWrapper<UsuarioDTO>> salvarUsuario(final UsuarioDTO usuarioDTO) {
 		Usuario itemSalvar = this.modelMapper.map(usuarioDTO, Usuario.class);
 		List<Endereco> enderecos = itemSalvar.getEnderecos();
 		
@@ -105,17 +130,31 @@ public class UsuarioService {
 			enderecos.forEach(c -> c = this.enderecoRepository.save(c));
 			itemSalvar.setEnderecos(enderecos);
 		}
-		return new ResponseEntity<>(this.modelMapper.map(itemSalvar, UsuarioDTO.class), HttpStatus.OK);
+		
+		if(itemSalvar != null && itemSalvar.getId() != null)
+		{
+			return new ResponseEntity<>(new ResponseWrapper<>(this.modelMapper.map(itemSalvar, UsuarioDTO.class), null), HttpStatus.CREATED);
+		}else {
+			ResponseWrapper<UsuarioDTO> responseWrapper = new ResponseWrapper<>();
+	        responseWrapper.setMessage("Erro ao cadastrar o usuário na base de dados");
+	        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseWrapper);
+		}
 	}
 	
 	// SALVAR (INSERIR/ALTERAR) O CADASTRO DE UM ENDERECO PARA UM USUARIO JA CADASTRADO
 	@Transactional
-	public ResponseEntity<EnderecoDTO> salvarEndereco(final EnderecoDTO enderecoDTO, final Long idUsuario) {
+	public ResponseEntity<ResponseWrapper<EnderecoDTO>> salvarEndereco(final EnderecoDTO enderecoDTO, final Long idUsuario) {
 		Endereco itemSalvar = this.modelMapper.map(enderecoDTO, Endereco.class);
 		
 		// encontra o usuario:
-		Usuario usuario = usuarioRepository.findById(idUsuario)
-				.orElseThrow(() -> new NotFoundException("Cadastro ID: " + idUsuario + " Não encontrado!!"));
+		Usuario usuario = usuarioRepository.findById(idUsuario).orElse(null);
+		
+		if(usuario == null)
+		{
+			ResponseWrapper<EnderecoDTO> responseWrapper = new ResponseWrapper<>();
+	        responseWrapper.setMessage("Usuário com id <" + idUsuario +"> não encontrado na base de dados");
+	        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseWrapper);
+		}
 
 		if(itemSalvar.getPrincipal() != null && Boolean.TRUE.equals(itemSalvar.getPrincipal()))
 		{
@@ -133,27 +172,43 @@ public class UsuarioService {
 				enderecosMapeados.forEach(c -> c = this.enderecoRepository.save(c));
 			}
 		}	
-		// salva o endereco:
+		//atribui o usuário ao endereço para manter o relacionamento
 		itemSalvar.setUsuario(usuario);
+		// salva o endereco:
 		itemSalvar = enderecoRepository.save(itemSalvar);
-		return new ResponseEntity<>(this.modelMapper.map(itemSalvar, EnderecoDTO.class), HttpStatus.OK);
+		
+		if(itemSalvar != null && itemSalvar.getId() != null)
+		{
+			return new ResponseEntity<>(new ResponseWrapper<>(this.modelMapper.map(itemSalvar, EnderecoDTO.class), null), HttpStatus.CREATED);
+		}else {
+			ResponseWrapper<EnderecoDTO> responseWrapper = new ResponseWrapper<>();
+	        responseWrapper.setMessage("Erro ao cadastrar o endereço para o usuário com id <" + idUsuario +"> na base de dados");
+	        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseWrapper);
+		}
 	}
 
 	// DELETAR USUARIO
-	public ResponseEntity<Boolean> deleteUsuario(Long id) {
+	public ResponseEntity<ResponseWrapper<String>> deleteUsuario(Long id) {
 		if (usuarioRepository.existsById(id)) {
 			usuarioRepository.deleteById(id);
-			return new ResponseEntity<>(true, HttpStatus.OK);
+			return new ResponseEntity<>(new ResponseWrapper<>("Sucesso!!", null), HttpStatus.OK);
+		}else {
+			return new ResponseEntity<>(new ResponseWrapper<>("usuario com id <"+id+"> não encontrado !!!", null), HttpStatus.NOT_FOUND);
 		}
-		return new ResponseEntity<>(false, HttpStatus.OK);
 	}
 	
 	// DELETAR ENDERECO DE UM USUARIO
-	public ResponseEntity<Boolean> deleteEndereco(Long idUsuario, Long idEndereco) {
+	public ResponseEntity<ResponseWrapper<String>> deleteEndereco(Long idUsuario, Long idEndereco) {
 		if (usuarioRepository.existsById(idUsuario)) {
-			enderecoRepository.deleteById(idEndereco);
-			return new ResponseEntity<>(true, HttpStatus.OK);
+			if(enderecoRepository.existsById(idEndereco))
+			{
+				enderecoRepository.deleteById(idEndereco);
+				return new ResponseEntity<>(new ResponseWrapper<>("Sucesso!!", null), HttpStatus.OK);
+			}else {
+				return new ResponseEntity<>(new ResponseWrapper<>("endereço com id <"+idEndereco+"> não encontrado !!!", null), HttpStatus.NOT_FOUND);
+			}			
+		}else {
+			return new ResponseEntity<>(new ResponseWrapper<>("usuario com id <"+idUsuario+"> não encontrado !!!", null), HttpStatus.NOT_FOUND);
 		}
-		return new ResponseEntity<>(false, HttpStatus.OK);
 	}
 }

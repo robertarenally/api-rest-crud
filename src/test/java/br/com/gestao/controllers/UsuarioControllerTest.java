@@ -24,13 +24,16 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.core.type.TypeReference;
 
+import br.com.gestao.commons.ResponseWrapper;
 import br.com.gestao.dto.EnderecoDTO;
 import br.com.gestao.dto.UsuarioDTO;
 import br.com.gestao.services.UsuarioService;
@@ -94,7 +97,8 @@ class UsuarioControllerTest {
 	void testeBuscaTodosUsuarios() throws Exception {
 
 		// Configurar comportamento simulado do serviço
-		when(usuarioService.findAll()).thenReturn(usuariosResponse);
+		ResponseEntity<ResponseWrapper<List<UsuarioDTO>>> response = new ResponseEntity<>(new ResponseWrapper<>(usuariosResponse, null), HttpStatus.OK);
+		when(usuarioService.findAll()).thenReturn(response);
 		
 		// Executar a solicitação HTTP GET
 		mockMvc.perform(get("/usuarios"))
@@ -107,7 +111,9 @@ class UsuarioControllerTest {
 	void testeBuscaUsuarioById() throws Exception {
 
 		// Configurar comportamento simulado do serviço
-		when(usuarioService.findById(Mockito.any())).thenReturn(usuarioResponse);
+
+		ResponseEntity<ResponseWrapper<UsuarioDTO>> response = new ResponseEntity<>(new ResponseWrapper<>(usuarioResponse, null), HttpStatus.OK);
+		when(usuarioService.findById(Mockito.any())).thenReturn(response);
 		
 		// Executar a solicitação HTTP GET
 		mockMvc.perform(get("/usuarios/1"))
@@ -120,7 +126,8 @@ class UsuarioControllerTest {
 	void testeBuscaEnderecosDoUsuarioId() throws Exception {
 
 		// Configurar comportamento simulado do serviço
-		when(usuarioService.findEnderecoByIdUsuario(Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(ResponseEntity.ok(pageEndereco));
+		ResponseEntity<ResponseWrapper<Page<EnderecoDTO>>> response = new ResponseEntity<>(new ResponseWrapper<>(pageEndereco, null), HttpStatus.OK);
+		when(usuarioService.findEnderecoByIdUsuario(Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(response);
 		
 		// Executar a solicitação HTTP GET
 		mockMvc.perform(get("/usuarios/1/enderecos"))
@@ -133,7 +140,8 @@ class UsuarioControllerTest {
 	void testeBuscaTodosUsuariosComPaginacao() throws Exception {
 
 		// Configurar comportamento simulado do serviço
-		when(usuarioService.findAll(Mockito.any(), Mockito.any())).thenReturn(ResponseEntity.ok(pageUsuario));
+		ResponseEntity<ResponseWrapper<Page<UsuarioDTO>>> response = new ResponseEntity<>(new ResponseWrapper<>(pageUsuario, null), HttpStatus.OK);
+		when(usuarioService.findAll(Mockito.any(), Mockito.any())).thenReturn(response);
 		
 		// Executar a solicitação HTTP GET
 		mockMvc.perform(get("/usuarios/listar-todos"))
@@ -146,7 +154,8 @@ class UsuarioControllerTest {
 	void testeBuscaTodosUsuariosPeloNomeComPaginacao() throws Exception {
 
 		// Configurar comportamento simulado do serviço
-		when(usuarioService.findByNomeLike(Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(ResponseEntity.ok(pageUsuario));
+		ResponseEntity<ResponseWrapper<Page<UsuarioDTO>>> response = new ResponseEntity<>(new ResponseWrapper<>(pageUsuario, null), HttpStatus.OK);
+		when(usuarioService.findByNomeLike(Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(response);
 		
 		// Executar a solicitação HTTP GET
 		mockMvc.perform(get("/usuarios/listar-por-nome?name=Santana"))
@@ -162,20 +171,20 @@ class UsuarioControllerTest {
 		UsuarioDTO bodyRequest = UsuarioDTO.builder().id(1L).nome("Manoel Rafael Osvaldo Assis").enderecos(enderecosResponse).build();
 		
 		// Configurar comportamento simulado do serviço
-		when(usuarioService.salvarUsuario(Mockito.any(UsuarioDTO.class))).thenReturn(ResponseEntity.ok(usuarioResponse));
+		ResponseEntity<ResponseWrapper<UsuarioDTO>> response = new ResponseEntity<>(new ResponseWrapper<>(usuarioResponse, null), HttpStatus.CREATED);
+		when(usuarioService.salvarUsuario(Mockito.any(UsuarioDTO.class))).thenReturn(response);
 		
 		MvcResult mvcResult = mockMvc.perform(post("/usuarios/salvar")
 				.contentType(MediaType.APPLICATION_JSON)
 				.header("Content-Type", "application/json")
                 .accept("application/json;charset=UTF-8")
 				.content(objectMapper.writeValueAsString(bodyRequest)))
-				.andExpect(status().isOk())
+				.andExpect(status().isCreated())
                 .andReturn(); 
-		
-		String responseBody = mvcResult.getResponse().getContentAsString();
-		UsuarioDTO resultado = objectMapper.readValue(responseBody, UsuarioDTO.class);
-        assertThat(resultado.getId()).isNotNull();
-
+        
+        String responseBody = mvcResult.getResponse().getContentAsString();
+		ResponseWrapper<UsuarioDTO> resultado = objectMapper.readValue(responseBody, new TypeReference<ResponseWrapper<UsuarioDTO>>() {});
+        assertThat(resultado.getData().getId()).isNotNull();
 	}
 	
 	@Test
@@ -185,19 +194,20 @@ class UsuarioControllerTest {
 		UsuarioDTO bodyRequest = UsuarioDTO.builder().id(1L).nome("Manoel Rafael Osvaldo Assis").enderecos(enderecosResponse).build();
 		
 		// Configurar comportamento simulado do serviço
-		when(usuarioService.salvarUsuario(Mockito.any(UsuarioDTO.class))).thenReturn(ResponseEntity.ok(usuarioResponse));
+		ResponseEntity<ResponseWrapper<UsuarioDTO>> response = new ResponseEntity<>(new ResponseWrapper<>(usuarioResponse, null), HttpStatus.CREATED);
+		when(usuarioService.salvarUsuario(Mockito.any(UsuarioDTO.class))).thenReturn(response);
 		
 		MvcResult mvcResult = mockMvc.perform(put("/usuarios/alterar")
 				.contentType(MediaType.APPLICATION_JSON)
 				.header("Content-Type", "application/json")
                 .accept("application/json;charset=UTF-8")
 				.content(objectMapper.writeValueAsString(bodyRequest)))
-				.andExpect(status().isOk())
+				.andExpect(status().isCreated())
                 .andReturn(); 
 		
 		String responseBody = mvcResult.getResponse().getContentAsString();
-		UsuarioDTO resultado = objectMapper.readValue(responseBody, UsuarioDTO.class);
-        assertThat(resultado.getId()).isNotNull();
+		ResponseWrapper<UsuarioDTO> resultado = objectMapper.readValue(responseBody, new TypeReference<ResponseWrapper<UsuarioDTO>>() {});
+        assertThat(resultado.getData().getId()).isNotNull();
 
 	}
 	
@@ -215,19 +225,20 @@ class UsuarioControllerTest {
 				.build();
 		
 		// Configurar comportamento simulado do serviço
-		when(usuarioService.salvarEndereco(Mockito.any(EnderecoDTO.class),Mockito.any())).thenReturn(ResponseEntity.ok(enderecoResponse));
+		ResponseEntity<ResponseWrapper<EnderecoDTO>> response = new ResponseEntity<>(new ResponseWrapper<>(enderecoResponse, null), HttpStatus.CREATED);
+		when(usuarioService.salvarEndereco(Mockito.any(EnderecoDTO.class),Mockito.any())).thenReturn(response);
 		
 		MvcResult mvcResult = mockMvc.perform(post("/usuarios/1/enderecos/salvar")
 				.contentType(MediaType.APPLICATION_JSON)
 				.header("Content-Type", "application/json")
                 .accept("application/json;charset=UTF-8")
 				.content(objectMapper.writeValueAsString(bodyRequest)))
-				.andExpect(status().isOk())
+				.andExpect(status().isCreated())
                 .andReturn(); 
-		
-		String responseBody = mvcResult.getResponse().getContentAsString();
-		EnderecoDTO resultado = objectMapper.readValue(responseBody, EnderecoDTO.class);
-        assertThat(resultado.getId()).isNotNull();
+        
+        String responseBody = mvcResult.getResponse().getContentAsString();
+		ResponseWrapper<EnderecoDTO> resultado = objectMapper.readValue(responseBody, new TypeReference<ResponseWrapper<EnderecoDTO>>() {});
+        assertThat(resultado.getData().getId()).isNotNull();
 	}
 	
 	@Test
@@ -244,54 +255,48 @@ class UsuarioControllerTest {
 				.build();
 		
 		// Configurar comportamento simulado do serviço
-		when(usuarioService.salvarEndereco(Mockito.any(EnderecoDTO.class),Mockito.any())).thenReturn(ResponseEntity.ok(enderecoResponse));
+		ResponseEntity<ResponseWrapper<EnderecoDTO>> response = new ResponseEntity<>(new ResponseWrapper<>(enderecoResponse, null), HttpStatus.CREATED);
+		when(usuarioService.salvarEndereco(Mockito.any(EnderecoDTO.class),Mockito.any())).thenReturn(response);
 		
 		MvcResult mvcResult = mockMvc.perform(put("/usuarios/1/enderecos/alterar")
 				.contentType(MediaType.APPLICATION_JSON)
 				.header("Content-Type", "application/json")
                 .accept("application/json;charset=UTF-8")
 				.content(objectMapper.writeValueAsString(bodyRequest)))
-				.andExpect(status().isOk())
+				.andExpect(status().isCreated())
                 .andReturn(); 
-		
-		String responseBody = mvcResult.getResponse().getContentAsString();
-		EnderecoDTO resultado = objectMapper.readValue(responseBody, EnderecoDTO.class);
-        assertThat(resultado.getId()).isNotNull();
+        
+        String responseBody = mvcResult.getResponse().getContentAsString();
+		ResponseWrapper<EnderecoDTO> resultado = objectMapper.readValue(responseBody, new TypeReference<ResponseWrapper<EnderecoDTO>>() {});
+        assertThat(resultado.getData().getId()).isNotNull();
 	}
 	
 	@Test
 	void testeDeletaUsuarioComSucesso() throws Exception {
 
 		// Configurar comportamento simulado do serviço
-		when(usuarioService.deleteUsuario(Mockito.any())).thenReturn(ResponseEntity.ok(true));
+		ResponseEntity<ResponseWrapper<String>> response = new ResponseEntity<>(new ResponseWrapper<>("Sucesso!!", null), HttpStatus.OK);
+		when(usuarioService.deleteUsuario(Mockito.any())).thenReturn(response);
 		
-		MvcResult mvcResult = mockMvc.perform(delete("/usuarios/{id}", 1L)
+		mockMvc.perform(delete("/usuarios/{id}", 1L)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn(); 
-		
-		String responseBody = mvcResult.getResponse().getContentAsString();
-		assertEquals("true", responseBody);
-
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON)); 
 	}
 
 	@Test
 	void testeDeletaUsuarioComErro() throws Exception {
 
 		// Configurar comportamento simulado do serviço
-		when(usuarioService.deleteUsuario(Mockito.any())).thenReturn(ResponseEntity.ok(false));
+		ResponseEntity<ResponseWrapper<String>> response = new ResponseEntity<>(new ResponseWrapper<>("usuario com id <1> não encontrado !!!", null), HttpStatus.NOT_FOUND);
+		when(usuarioService.deleteUsuario(Mockito.any())).thenReturn(response);
 		
-		MvcResult mvcResult = mockMvc.perform(delete("/usuarios/{id}", 1L)
+		mockMvc.perform(delete("/usuarios/{id}", 1L)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn(); 
-		
-		String responseBody = mvcResult.getResponse().getContentAsString();
-		assertEquals("false", responseBody);
+                .andExpect(status().isNotFound())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON)); 
 
 	}
 	
@@ -300,35 +305,27 @@ class UsuarioControllerTest {
 	void testeDeletaEnderecoDoUsuarioComSucesso() throws Exception {
 
 		// Configurar comportamento simulado do serviço
-		when(usuarioService.deleteEndereco(Mockito.any(),Mockito.any())).thenReturn(ResponseEntity.ok(true));
+		ResponseEntity<ResponseWrapper<String>> response = new ResponseEntity<>(new ResponseWrapper<>("usuario com id <1> não encontrado !!!", null), HttpStatus.OK);
+		when(usuarioService.deleteEndereco(Mockito.any(),Mockito.any())).thenReturn(response);
 		
-		MvcResult mvcResult = mockMvc.perform(delete("/usuarios/{idUsuario}/endereco/{idEndereco}", 1L, 1L)
+		mockMvc.perform(delete("/usuarios/{idUsuario}/endereco/{idEndereco}", 1L, 1L)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn(); 
-		
-		String responseBody = mvcResult.getResponse().getContentAsString();
-		assertEquals("true", responseBody);
-
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON));
 	}
 
 	@Test
 	void testeDeletaEnderecoDoUsuarioComErro() throws Exception {
 
 		// Configurar comportamento simulado do serviço
-		when(usuarioService.deleteEndereco(Mockito.any(), Mockito.any())).thenReturn(ResponseEntity.ok(false));
+		ResponseEntity<ResponseWrapper<String>> response = new ResponseEntity<>(new ResponseWrapper<>("usuario com id <1> não encontrado !!!", null), HttpStatus.NOT_FOUND);
+		when(usuarioService.deleteEndereco(Mockito.any(),Mockito.any())).thenReturn(response);
 
-		MvcResult mvcResult = mockMvc.perform(delete("/usuarios/{idUsuario}/endereco/{idEndereco}", 1L, 1L)
+		mockMvc.perform(delete("/usuarios/{idUsuario}/endereco/{idEndereco}", 1L, 1L)
 				  .contentType(MediaType.APPLICATION_JSON)
 				  .accept(MediaType.APPLICATION_JSON))
-				  .andExpect(status().isOk())
-				  .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-				  .andReturn();
-		
-		String responseBody = mvcResult.getResponse().getContentAsString();
-		assertEquals("false", responseBody);
-
+				  .andExpect(status().isNotFound())
+				  .andExpect(content().contentType(MediaType.APPLICATION_JSON));
 	}
 }

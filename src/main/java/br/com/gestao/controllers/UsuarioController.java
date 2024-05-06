@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.com.gestao.commons.Const;
+import br.com.gestao.commons.ResponseWrapper;
 import br.com.gestao.dto.EnderecoDTO;
 import br.com.gestao.dto.UsuarioDTO;
 import br.com.gestao.services.UsuarioService;
@@ -33,22 +34,22 @@ public class UsuarioController {
 	public UsuarioController(UsuarioService usuarioService) {
 		this.usuarioService = usuarioService;
 	}
-	
+	//implementar o teste unitario desse controller
 	@GetMapping("/{id}")
 	@Operation(summary = "Pesquisar por ID do cadastro de Usuario")
-	public ResponseEntity<UsuarioDTO> findById(@PathVariable Long id) {
-		return ResponseEntity.ok(usuarioService.findById(id));
+	public ResponseEntity<ResponseWrapper<UsuarioDTO>> findById(@PathVariable Long id) {
+		return usuarioService.findById(id);
 	}
 
 	@GetMapping
 	@Operation(summary = "Listar todos os cadastros de Usuario")
-	public ResponseEntity<List<UsuarioDTO>> findAll() {
-		return ResponseEntity.ok(usuarioService.findAll());
+	public ResponseEntity<ResponseWrapper<List<UsuarioDTO>>> findAll() {
+		return usuarioService.findAll();
 	}
 	
 	@GetMapping("/{id}/enderecos")
 	@Operation(summary = "Listar todos os endereços de um usuário")
-	public ResponseEntity<Page<EnderecoDTO>> findById(@PathVariable Long id,
+	public ResponseEntity<ResponseWrapper<Page<EnderecoDTO>>> findById(@PathVariable Long id,
 			@RequestParam(value = "page", required = false, defaultValue = "1") Integer pagina,
 			@RequestParam(value = "quantity", required = false, defaultValue = "50") Integer quantidade) {
 		return usuarioService.findEnderecoByIdUsuario(id, pagina, quantidade);
@@ -56,7 +57,7 @@ public class UsuarioController {
 	
 	@Operation(summary = "Listar todos os Usuarios e mostrar o resultado utilizando paginação")
 	@GetMapping(value = "/listar-todos", produces = Const.JSON_TYPE)
-	public ResponseEntity<Page<UsuarioDTO>> findAll(
+	public ResponseEntity<ResponseWrapper<Page<UsuarioDTO>>> findAll(
 			@RequestParam(value = "page", required = false, defaultValue = "1") Integer pagina,
 			@RequestParam(value = "quantity", required = false, defaultValue = "50") Integer quantidade) {
 		return this.usuarioService.findAll(pagina, quantidade);
@@ -64,7 +65,7 @@ public class UsuarioController {
 	
 	@Operation(summary = "Listar todos os Usuarios que tem um nome parecido com o Nome consultado")
 	@GetMapping(value = "/listar-por-nome", produces = Const.JSON_TYPE)
-	public ResponseEntity<Page<UsuarioDTO>> findByNomeLike(
+	public ResponseEntity<ResponseWrapper<Page<UsuarioDTO>>> findByNomeLike(
 			@RequestParam(value = "page", required = false, defaultValue = "1") Integer pagina,
 			@RequestParam(value = "quantity", required = false, defaultValue = "50") Integer quantidade,
 			@RequestParam(value = "name", required = false, defaultValue = "") String nome) {
@@ -73,38 +74,38 @@ public class UsuarioController {
 
 	@Operation(summary = "Salvar um cadastro completo do Usuario, incluindo os seus endereços")
 	@PostMapping(value = "/salvar", headers = { Const.HEADER_ACCEPT_JSON }, produces = Const.JSON_TYPE, consumes = Const.JSON_TYPE)
-	public ResponseEntity<UsuarioDTO> salvarUsuario(@RequestBody UsuarioDTO body) {
+	public ResponseEntity<ResponseWrapper<UsuarioDTO>> salvarUsuario(@RequestBody UsuarioDTO body) {
 		return usuarioService.salvarUsuario(body);
 	}
 	
 	@Operation(summary = "Alterar o endereço para um usuario especifico")
 	@PostMapping(value = "/{id}/enderecos/salvar", headers = { Const.HEADER_ACCEPT_JSON }, produces = Const.JSON_TYPE, consumes = Const.JSON_TYPE)
-	public ResponseEntity<EnderecoDTO> salvarEndereco(@PathVariable Long id, @RequestBody EnderecoDTO endereco) {
+	public ResponseEntity<ResponseWrapper<EnderecoDTO>>  salvarEndereco(@PathVariable Long id, @RequestBody EnderecoDTO endereco) {
 		return usuarioService.salvarEndereco(endereco, id);
 	}
 	
 
 	@Operation(summary = "Alterar um cadastro completo do Usuario, incluindo os seus endereços")
 	@PutMapping(value = "/alterar", headers = { Const.HEADER_ACCEPT_JSON }, produces = Const.JSON_TYPE, consumes = Const.JSON_TYPE)
-	ResponseEntity<UsuarioDTO> updateUsuario(@RequestBody UsuarioDTO body) {
+	public ResponseEntity<ResponseWrapper<UsuarioDTO>> updateUsuario(@RequestBody UsuarioDTO body) {
 		return usuarioService.salvarUsuario(body);
 	}
 	
 	@Operation(summary = "Alterar o endereço para um usuario especifico")
 	@PutMapping(value = "/{id}/enderecos/alterar", headers = { Const.HEADER_ACCEPT_JSON }, produces = Const.JSON_TYPE, consumes = Const.JSON_TYPE)
-	public ResponseEntity<EnderecoDTO> updateEndereco(@PathVariable Long id, @RequestBody EnderecoDTO endereco) {
+	public ResponseEntity<ResponseWrapper<EnderecoDTO>>  updateEndereco(@PathVariable Long id, @RequestBody EnderecoDTO endereco) {
 		return usuarioService.salvarEndereco(endereco, id);
 	}
 
 	@DeleteMapping("/{id}")
 	@Operation(summary = "Excluir cadastro de Usuario")
-	public ResponseEntity<Boolean> deleteUsuario(@PathVariable Long id) {
+	public ResponseEntity<ResponseWrapper<String>> deleteUsuario(@PathVariable Long id) {
 		return usuarioService.deleteUsuario(id);
 	}
 	
 	@DeleteMapping("/{idUsuario}/endereco/{idEndereco}")
 	@Operation(summary = "Excluir cadastro de Usuario")
-	public ResponseEntity<Boolean> deleteEndereco(@PathVariable Long idUsuario, @PathVariable Long idEndereco) {
+	public ResponseEntity<ResponseWrapper<String>> deleteEndereco(@PathVariable Long idUsuario, @PathVariable Long idEndereco) {
 		return usuarioService.deleteEndereco(idUsuario, idEndereco);
 	}
 }

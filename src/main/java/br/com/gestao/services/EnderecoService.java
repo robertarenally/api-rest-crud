@@ -42,7 +42,7 @@ public class EnderecoService {
 	// LISTAR TODOS
 	public ResponseEntity<ResponseWrapper<List<EnderecoDTO>>> findAll() {
 		List<EnderecoDTO> enderecos = enderecoRepository.findAll().stream().map(valorCC -> modelMapper.map(valorCC, EnderecoDTO.class)).collect(Collectors.toList());
-		if(enderecos != null)
+		if(enderecos != null && !enderecos.isEmpty())
 		{
 			return new ResponseEntity<>(new ResponseWrapper<>(enderecos, null), HttpStatus.OK);
 		}else {

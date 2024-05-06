@@ -49,8 +49,8 @@ public class UsuarioService {
 
 	// LISTAR TODOS
 	public ResponseEntity<ResponseWrapper<List<UsuarioDTO>>> findAll() {
-		List<UsuarioDTO> usuarios = usuarioRepository.findAll().stream().map(valorCC -> modelMapper.map(valorCC, UsuarioDTO.class)).collect(Collectors.toList());
-		if(usuarios != null)
+		List<UsuarioDTO> usuarios = usuarioRepository.findAll().stream().map(usuario -> modelMapper.map(usuario, UsuarioDTO.class)).collect(Collectors.toList());
+		if(usuarios != null && !usuarios.isEmpty())
 		{
 			return new ResponseEntity<>(new ResponseWrapper<>(usuarios, null), HttpStatus.OK);
 		}else {
